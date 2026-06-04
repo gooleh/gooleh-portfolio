@@ -1,4 +1,4 @@
-const { notion, getTextContent } = require('./_notion');
+import { notion, getTextContent } from './_notion.js';
 
 const parseBlogPost = (page) => {
   const p = page.properties;
@@ -23,7 +23,7 @@ const parseBlogPost = (page) => {
   };
 };
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).end();
   try {
     const { results } = await notion.databases.query({
@@ -37,4 +37,4 @@ module.exports = async (req, res) => {
     console.error(e);
     res.status(500).json({ error: e.message });
   }
-};
+}

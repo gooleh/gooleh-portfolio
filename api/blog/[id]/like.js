@@ -1,6 +1,6 @@
-const { notion } = require('../../_notion');
+import { notion } from '../../_notion.js';
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
   const { id } = req.query;
   try {
@@ -15,4 +15,4 @@ module.exports = async (req, res) => {
     console.error(e);
     res.status(500).json({ error: e.message });
   }
-};
+}

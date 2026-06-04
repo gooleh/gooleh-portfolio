@@ -1,5 +1,5 @@
-const { notion, getTextContent } = require('../_notion');
-const { NotionToMarkdown } = require('notion-to-md');
+import { notion, getTextContent } from '../_notion.js';
+import { NotionToMarkdown } from 'notion-to-md';
 
 const n2m = new NotionToMarkdown({ notionClient: notion });
 
@@ -26,7 +26,7 @@ const parseBlogPost = (page) => {
   };
 };
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).end();
   const { id } = req.query;
   try {
@@ -90,4 +90,4 @@ module.exports = async (req, res) => {
     console.error(e);
     res.status(500).json({ error: e.message });
   }
-};
+}

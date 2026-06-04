@@ -1,7 +1,7 @@
-module.exports = async (req, res) => {
-  try {
-    const { notion } = require('./_notion');
+import { notion } from './_notion.js';
 
+export default async function handler(req, res) {
+  try {
     const result = {
       envVars: {
         NOTION_API_KEY: !!process.env.NOTION_API_KEY,
@@ -18,4 +18,4 @@ module.exports = async (req, res) => {
   } catch (e) {
     res.status(500).json({ error: e.message, stack: e.stack });
   }
-};
+}
