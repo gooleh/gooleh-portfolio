@@ -2,7 +2,6 @@ import prose from "@tailwindcss/typography";
 import forms from "@tailwindcss/forms";
 import plugin from "tailwindcss/plugin";
 import colors from "tailwindcss/colors";
-import aspectRatio from "@tailwindcss/aspect-ratio";
 import animate from "tailwindcss-animate";
 import { ACCENT_COLOR, BASE_COLOR } from "./src/config";
 
@@ -40,7 +39,6 @@ export default {
   plugins: [
     prose,
     forms,
-    aspectRatio,
     animate,
     plugin(function ({ addVariant }) {
       addVariant(

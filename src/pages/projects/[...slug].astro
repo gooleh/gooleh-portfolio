@@ -1,29 +1,125 @@
 ---
-import { type CollectionEntry } from "astro:content";
 import BaseLayout from "$layouts/BaseLayout.astro";
 import { getProjects } from "src/utils";
+import type { NotionProject } from "src/utils";
 import Navbar from "$components/Navigation/Navbar.svelte";
 
 export async function getStaticPaths() {
-  const posts = await getProjects();
-  return posts.map((post: any) => ({
-    params: { slug: post.slug },
-    props: post,
+  const projects = await getProjects();
+  return projects.map((project: NotionProject) => ({
+    params: { slug: project.slug },
+    props: { project },
   }));
 }
-type Props = CollectionEntry<"projects">;
 
-const post = Astro.props;
-const { Content } = await post.render();
+type Props = { project: NotionProject };
+const { project } = Astro.props;
 ---
 
-<BaseLayout {...post.data} image={post.slug + ".png"}>
+<BaseLayout title={project.name} description={project.description}>
   <Navbar client:load active="projects" />
 
-  <!-- {
-    post.data.projectLayout === "grid" ? (
-      <ProjectGrid project={post.data} client:visible />
-    ) : null
-  } -->
-  <Content />
+  <div class="mx-auto max-w-3xl px-6 lg:px-8 py-16 md:py-24">
+    <div class="mb-8">
+      <a
+        href="/projects"
+        class="text-sm text-base-400 hover:text-accent-400 transition-colors"
+      >
+        ← all projects
+      </a>
+    </div>
+
+    <h1 class="text-4xl font-bold tracking-tight text-base-800 dark:text-base-100 sm:text-5xl mb-4">
+      {project.name}
+    </h1>
+
+    {project.technologies.length > 0 && (
+      <div class="flex flex-wrap gap-2 mb-8">
+        {project.technologies.map((tag: string) => (
+          <span class="text-xs text-accent-300 bg-accent-950/50 border border-accent-500/20 rounded-full px-3 py-1">
+            {tag}
+          </span>
+        ))}
+      </div>
+    )}
+
+    {project.thumbnail && (
+      <div class="mb-10 rounded-2xl overflow-hidden border border-white/10">
+        <img
+          src={project.thumbnail}
+          alt={project.name}
+          class="w-full object-cover"
+        />
+      </div>
+    )}
+
+    {project.description && (
+      <p class="text-base-600 dark:text-base-300 text-lg leading-relaxed mb-8">
+        {project.description}
+      </p>
+    )}
+
+    {project.details && (
+      <div class="mb-8">
+        <h2 class="text-sm font-semibold text-base-500 dark:text-base-400 uppercase tracking-wide mb-3">details</h2>
+        <p class="text-base-600 dark:text-base-300 leading-relaxed">{project.details}</p>
+      </div>
+    )}
+
+    {project.features.length > 0 && (
+      <div class="mb-8">
+        <h2 class="text-sm font-semibold text-base-500 dark:text-base-400 uppercase tracking-wide mb-3">features</h2>
+        <ul class="space-y-2">
+          {project.features.map((f: string) => (
+            <li class="flex items-start gap-2 text-base-600 dark:text-base-300">
+              <span class="text-accent-400 mt-1">–</span>
+              <span>{f}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+
+    {project.challenges && (
+      <div class="mb-8">
+        <h2 class="text-sm font-semibold text-base-500 dark:text-base-400 uppercase tracking-wide mb-3">challenges</h2>
+        <p class="text-base-600 dark:text-base-300 leading-relaxed">{project.challenges}</p>
+      </div>
+    )}
+
+    {project.additionalImages.length > 0 && (
+      <div class="mb-10 grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {project.additionalImages.map((src: string) => (
+          <div class="rounded-2xl overflow-hidden border border-white/10">
+            <img src={src} alt="" class="w-full object-cover" loading="lazy" />
+          </div>
+        ))}
+      </div>
+    )}
+
+    {(project.projectUrl || project.repoUrl) && (
+      <div class="flex gap-4 pt-4 border-t border-white/10">
+        {project.projectUrl && (
+          <a
+            href={project.projectUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-sm font-medium text-accent-400 hover:text-accent-300 transition-colors"
+          >
+            view project →
+          </a>
+        )}
+        {project.repoUrl && (
+          <a
+            href={project.repoUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-sm font-medium text-base-400 hover:text-base-300 transition-colors"
+          >
+            source code →
+          </a>
+        )}
+      </div>
+    )}
+  </div>
 </BaseLayout>

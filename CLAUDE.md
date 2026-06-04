@@ -78,56 +78,74 @@ Keep entries short. The goal is a scannable reference, not a tutorial.
 
 ## Project: 이태규(TaeGyue) 포트폴리오 사이트
 
-원작자(flo-bit)의 허락을 받아 개인 포트폴리오 사이트로 수정 중.
+원작자(flo-bit)의 허락을 받아 개인 포트폴리오 사이트로 수정.
 
 - **로컬 경로**: `C:\Users\landr\Gooleh\Gooleh_dev`
 - **GitHub**: https://github.com/gooleh/gooleh-portfolio
 - **라이브**: https://gooleh-portfolio.vercel.app
-- **배포**: `npx vercel --prod` 또는 `git push` (Vercel 자동 배포 미연동 — CLI로 수동 배포 중)
+- **배포**: `npx vercel --prod` (Vercel 자동 배포 미연동 — CLI로 수동 배포)
 
 ### 기술 스택
 - **Framework**: Astro 5 (output: static)
-- **UI**: Svelte 5 컴포넌트 + Tailwind CSS
+- **UI**: Svelte 5 컴포넌트 + Tailwind CSS v3
 - **3D**: Three.js / Threlte (히어로 섹션 인터랙티브 행성)
-- **콘텐츠**: Markdown / MDX (`src/content/`)
+- **콘텐츠**: Markdown (`src/content/main/`)
 - **배포**: Vercel + `@astrojs/vercel` 어댑터
-- **DB**: Notion API — `/api` 폴더가 Vercel Serverless Functions로 동작
+- **프로젝트 데이터**: Notion API — 빌드 시 fetch (`src/lib/notion-projects.ts`)
 
-### Notion API 구조 (`/api`)
-| 파일 | 엔드포인트 | 설명 |
+### 개인화 완료 현황 (모두 ✅)
+
+| 파일 | 역할 |
+|---|---|
+| `src/config.ts` | 사이트 URL, 파비콘, 테마 색상, 소셜 링크 |
+| `src/content/main/about.md` | About 섹션 본문 |
+| `src/components/BaseHead.astro` | SEO 메타태그 |
+| `src/components/Footer.astro` | 푸터 크레딧 |
+| `src/components/About/Resume/Resume.astro` | 경력/학력 (코트야드 바이 메리어트 / 포시즌스 / 인하공업전문대학) |
+| `src/assets/about/me/me.jpg` | 프로필 사진 |
+| `src/assets/about/logos/marriott.svg` | 메리어트 로고 (SVG) |
+| `src/assets/about/logos/fourseasons.svg` | 포시즌스 로고 (SVG) |
+| `src/assets/about/logos/inha.svg` | 인하공업전문대학 로고 (SVG) |
+| `src/lib/notion-projects.ts` | Notion DB 프로젝트 fetch |
+| `src/content/config.ts` | Bluesky 제거 완료, blog 컬렉션만 유지 |
+
+### 프로젝트 시스템 (Notion 연동)
+
+프로젝트는 MDX 파일 없이 **Notion DB에서 빌드 시 fetch**합니다.
+
+- **fetch 로직**: `src/lib/notion-projects.ts` → `src/utils.ts`의 `getProjects()` / `getFeaturedProjects()`
+- **표시**: `src/components/Projects/Projects.astro` (홈), `src/pages/projects/index.astro` (전체 목록), `src/pages/projects/[...slug].astro` (상세)
+
+**Notion DB 스키마**:
+| 프로퍼티 | 타입 | 설명 |
 |---|---|---|
-| `_notion.js` | — | Notion 클라이언트 공통 모듈 |
-| `projects.js` | GET /api/projects | 개인 프로젝트 목록 |
-| `team-projects.js` | GET /api/team-projects | 팀 프로젝트 목록 |
-| `blog-posts.js` | GET /api/blog-posts | 블로그 포스트 목록 |
-| `blog/[id].js` | GET /api/blog/[id] | 블로그 포스트 상세 |
-| `blog/[id]/like.js` | POST /api/blog/[id]/like | 좋아요 |
-| `blog/[id]/view.js` | POST /api/blog/[id]/view | 조회수 |
-| `health.js` | GET /api/health | Notion 연결 상태 확인 |
+| `Name` | title | 프로젝트 이름 |
+| `Slug` | rich_text | URL slug — **한국어 제목이면 반드시 입력** (예: `my-project`) |
+| `Description` | rich_text | 짧은 설명 |
+| `Details` | rich_text | 상세 설명 |
+| `Image` | url | 썸네일 이미지 URL |
+| `Technologies` | multi_select | 기술 스택 태그 |
+| `Features` | rich_text | 기능 목록 (줄바꿈 구분) |
+| `Challenges` | rich_text | 어려웠던 점 |
+| `AdditionalImages` | rich_text | 추가 이미지 URL (쉼표 구분) |
+| `RepoUrl` | url | GitHub 링크 |
+| `ProjectUrl` | url | 배포 링크 |
+| `Order` | number | 정렬 순서 (낮을수록 앞) |
 
-- **주의**: `/api` 파일은 반드시 ES module (`import`/`export default`) 문법 사용. CommonJS (`require`/`module.exports`) 사용 시 `"type": "module"` 충돌로 500 에러 발생.
-- **환경변수**: Vercel 대시보드에 등록됨 — `NOTION_API_KEY`, `NOTION_PROJECTS_DB_ID`, `NOTION_TEAM_PROJECTS_DB_ID`, `NOTION_BLOG_DB_ID`, `NOTION_PARENT_PAGE_ID`
+**프로젝트 추가 방법**: Notion DB에 페이지 추가 → `npx vercel --prod` 재배포
 
-### 핵심 파일 — 개인화 관련
+### Tailwind 주의사항
+- `@tailwindcss/aspect-ratio` 플러그인 **제거됨** — 네이티브 `aspect-ratio` 유틸리티(`aspect-square` 등)와 충돌해서 제거. `aspect-w-*` / `aspect-h-*` 클래스 사용 불가.
+- 색상 테마는 `src/config.ts`의 `BASE_COLOR` / `ACCENT_COLOR`로만 제어
 
-| 파일 | 역할 | 상태 |
-|---|---|---|
-| `src/config.ts` | 사이트 URL, 파비콘, 테마 색상, 소셜 링크 | ✅ 완료 |
-| `src/content/main/about.md` | About 섹션 본문 | ✅ 기본 교체 완료 (내용 보강 필요) |
-| `src/components/BaseHead.astro` | SEO 메타태그, 기본 title/description | ✅ 완료 |
-| `src/components/Footer.astro` | 푸터 크레딧 | ✅ 완료 |
-| `src/components/About/Resume/Resume.astro` | 경력/학력 하드코딩 | ⬜ 미완료 — flo-bit 데이터 그대로 |
-| `src/content/projects/*.mdx` | 프로젝트 페이지들 | ⬜ 미완료 — flo-bit 프로젝트 그대로 |
-| `src/assets/about/me/me.webp` | 프로필 사진 | ⬜ 미완료 — flo-bit 사진 그대로 |
-| `src/assets/about/me/me-depth.webp` | 프로필 depth 이미지 (3D 효과용) | ⬜ 미완료 |
-| `src/content/config.ts` | Bluesky 로더 identifier | ⬜ 미완료 — Bluesky 계정 없으면 섹션 제거 필요 |
-
-### 남은 작업
-1. **프로필 사진 교체** — `src/assets/about/me/me.webp`, `me-depth.webp`
-2. **경력/학력 교체** — `src/components/About/Resume/Resume.astro` 하드코딩된 데이터 수정
-3. **프로젝트 교체** — `src/content/projects/*.mdx` + `src/assets/projects/` 썸네일
-4. **Bluesky 섹션 처리** — 계정 없으므로 `src/content/config.ts`의 posts 컬렉션 및 관련 UI 제거
-5. **About 텍스트 보강** — 실제 본인 스토리로 작성
+### 환경변수 (`.env.local` + Vercel 대시보드)
+```
+NOTION_API_KEY
+NOTION_PROJECTS_DB_ID
+NOTION_TEAM_PROJECTS_DB_ID
+NOTION_BLOG_DB_ID
+NOTION_PARENT_PAGE_ID
+```
 
 ### 경로 별칭 (vite alias)
 ```
@@ -139,13 +157,11 @@ $content     →  src/content/
 
 ### 개발 명령어
 ```bash
-npm run dev      # 로컬 개발 서버 (localhost:4321)
-npm run build    # 타입 체크 후 빌드
+npm run dev        # 로컬 개발 서버 (localhost:4321)
+npm run build      # 타입 체크 후 정적 빌드
 npx vercel --prod  # 프로덕션 배포
 ```
 
-### 주의사항
-- 색상 테마는 `src/config.ts`의 `BASE_COLOR` / `ACCENT_COLOR`로만 제어
-- 프로젝트 썸네일: `src/assets/projects/<slug>/thumbnail.png` + `video-thumbnail.mp4`
-- `public/lowpoly_nature/` — 3D 씬용 .glb 모델, 수정 금지
-- `package.json`에 `"type": "module"` 있음 — `/api` 파일은 반드시 ES module 문법
+### 건드리지 말 것
+- `public/lowpoly_nature/` — 3D 씬용 .glb 모델
+- `package.json`의 `"type": "module"` — `/api` 파일은 반드시 ES module 문법 (`import`/`export default`)

@@ -1,8 +1,7 @@
 ---
-import enna from "$assets/about/logos/enna.png";
-import puppet from "$assets/about/logos/puppet.png";
-import tub from "$assets/about/logos/tub.png";
-import hyperlumen from "$assets/about/logos/hyperlumen.png";
+import marriott from "$assets/about/logos/marriott.svg";
+import fourseasons from "$assets/about/logos/fourseasons.svg";
+import inha from "$assets/about/logos/inha.svg";
 
 import Role from "./Role.astro";
 import type { ImageMetadata } from "astro";
@@ -14,42 +13,26 @@ let resume: Array<{
   start: string | { label: string; dateTime: string };
   end: string | { label: string; dateTime: string };
 }> = [
-  // {
-  //   company: "hyperlumen",
-  //   title: "co-founder",
-  //   logo: hyperlumen,
-  //   start: "2023",
-  //   end: "2024",
-  // },
   {
-    company: "enna",
-    title: "student software engineer",
-    logo: enna,
-    start: "2022",
-    end: {
-      label: "present",
-      dateTime: new Date().getFullYear().toString(),
-    },
+    company: "courtyard by marriott",
+    title: "food & beverage",
+    logo: marriott,
+    start: "2020",
+    end: "2023",
   },
   {
-    company: "puppet",
-    title: "co-founder",
-    logo: puppet,
-    start: "2022",
-    end: {
-      label: "present",
-      dateTime: new Date().getFullYear().toString(),
-    },
-  },
-  {
-    company: "tu berlin",
-    title: "studying computer science",
-    logo: tub,
+    company: "four seasons hotel",
+    title: "housekeeping",
+    logo: fourseasons,
     start: "2018",
-    end: {
-      label: "present",
-      dateTime: new Date().getFullYear().toString(),
-    },
+    end: "2020",
+  },
+  {
+    company: "inha technical college",
+    title: "computer information engineering",
+    logo: inha,
+    start: "2014",
+    end: "2018",
   },
 ];
 ---
