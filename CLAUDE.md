@@ -134,6 +134,28 @@ Keep entries short. The goal is a scannable reference, not a tutorial.
 
 **프로젝트 추가 방법**: Notion DB에 페이지 추가 → `npx vercel --prod` 재배포
 
+### UX 업그레이드 완료 현황
+
+| 기능 | 파일 | 비고 |
+|---|---|---|
+| Lenis smooth scroll | `src/layouts/BaseLayout.astro` | duration 1.2 |
+| Astro View Transitions | `src/layouts/BaseLayout.astro` | `<ClientRouter />` |
+| 스크롤 fade-up 애니메이션 | `src/layouts/BaseLayout.astro` (global CSS + IntersectionObserver) | `.section` 클래스 대상 |
+| 커스텀 커서 (dot + ring) | `src/components/CustomCursor.svelte` | hover 기기에서만 활성, cyan `#22d3ee` |
+| 한국어 slug 지원 | `src/lib/notion-projects.ts` | `toSlug()`에 `가-힣` 범위 추가 |
+| Map 서울 좌표 | `src/pages/map/index.astro` | `[126.978, 37.5665]` |
+| Learning 섹션 개인화 | `src/components/Learning/Learning.svelte` | 인하공업전문대학 커리큘럼 (2022–2025) |
+
+### 알려진 이슈
+
+- **Depth3D 프로필 사진** — `src/components/About/About.astro`에서 `depthMe = imageMe` (동일 파일)로 설정됨. 별도 depth map 이미지가 없어 3D 효과가 어색하게 보일 수 있음. 해결책: ① depth map 생성 후 교체, ② Depth3D 컴포넌트 제거하고 일반 `<Image>` 사용.
+
+### 다음 작업 후보
+
+1. **Depth3D 이슈 해결** — depth map 생성 또는 일반 이미지로 교체
+2. **폰트 업그레이드** — Pretendard(한/영 최적화) 또는 Geist 적용
+3. **프로젝트 카드 3D tilt** — 마우스 hover 시 카드가 3D로 기울어지는 효과
+
 ### Tailwind 주의사항
 - `@tailwindcss/aspect-ratio` 플러그인 **제거됨** — 네이티브 `aspect-ratio` 유틸리티(`aspect-square` 등)와 충돌해서 제거. `aspect-w-*` / `aspect-h-*` 클래스 사용 불가.
 - 색상 테마는 `src/config.ts`의 `BASE_COLOR` / `ACCENT_COLOR`로만 제어

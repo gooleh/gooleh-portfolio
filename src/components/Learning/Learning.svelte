@@ -9,87 +9,46 @@
 
   const learnings: Learning[] = [
     {
-      title: "local first and crdts",
+      title: "data communication & AI",
       description:
-        "working with roomy.chat and the stuff its built on.",
-      date: "2025-04",
+        "data communication, artificial intelligence.",
+      date: "2025-03",
     },
     {
-      title: "bluesky api and at protocol",
+      title: "front-end, big data & capstone",
       description:
-        "built way to many bluesky visualizations. lots of fun.",
-      date: "2024-11",
-    },
-    {
-      title: "Astro",
-      description:
-        "been really liking astro, reminds me of svelte, but even better for content driven static sites.",
-      date: "2024-10",
-    },
-    {
-      title: "blender",
-      description:
-        'making some low poly models in blender, lots of fun once you get over the "i\'m overwhelmed" feeling',
+        "front-end development, big data processing, wireless networks, LINC capstone design.",
       date: "2024-09",
     },
     {
-      title: "pixi.js",
+      title: "server, mobile & AI programming",
       description:
-        "been playing around with pixi.js for some game jams. awesome library for 2d games.",
-      date: "2024-07",
-    },
-    {
-      title: "rapier",
-      description:
-        "explored the internals of the physics engine rapier for a game engine i'm working on.",
-      date: "2024-06",
-    },
-    {
-      title: "supabase",
-      description:
-        "started using supabase for a few projects. still prefer mongodb as a database, but it has some cool features.",
-      date: "2024-05",
-    },
-    {
-      title: "unity and vr",
-      description:
-        "been working on a vr game in unity as part of a university project. uff, not a big fan of unity.",
+        "server programming, mobile programming, AI programming, TCP/IP, software engineering, startup project.",
       date: "2024-03",
     },
     {
-      title: "figma",
+      title: "java, sql & operating systems",
       description:
-        "playing around a bit designing some websites and app wireframes in figma",
-      date: "2024-01",
-    },
-    {
-      title: "threlte",
-      description:
-        "awesome library combining svelte and three.js. also used on this website.",
-      date: "2023-12",
-    },
-    {
-      title: "mongodb",
-      description: "switched from mysql to mongodb and never looked back.",
+        "Java, JSP, Oracle SQL & PL/SQL, operating systems, information security, system analysis & design, SW project.",
       date: "2023-09",
     },
     {
-      title: "svelte and sveltekit",
+      title: "OOP, data structures & IoT",
       description:
-        "love svelte, my favourite framework for web development. i use it for most of my personal projects, including this website.",
-      date: "2023-06",
+        "C#, object-oriented programming, databases, data structures, IoT, enterprise server management.",
+      date: "2023-03",
     },
     {
-      title: "tailwindcss",
+      title: "C, Python, JavaScript & networking",
       description:
-        "the best bad idea in web development. better than pure css by far. used in most of my newer projects including this website.",
-      date: "2023-05",
+        "C programming, JavaScript, Python, server setup, computer architecture, information security.",
+      date: "2022-09",
     },
     {
-      title: "react, next.js and reactnative",
+      title: "CS fundamentals",
       description:
-        "not the biggest fan of react, but it's still the most popular framework out there and on the native side there's no good alternative yet.",
-      date: "2023-01",
+        "C programming, algorithm basics, web programming, computer science fundamentals, networking.",
+      date: "2022-03",
     },
   ];
 

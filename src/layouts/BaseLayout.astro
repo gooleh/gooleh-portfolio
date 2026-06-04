@@ -1,5 +1,7 @@
 ---
 import BaseHead from "../components/BaseHead.astro";
+import { ClientRouter } from 'astro:transitions';
+import CustomCursor from '$components/CustomCursor.svelte';
 const { title, description, image } = Astro.props;
 ---
 
@@ -7,6 +9,7 @@ const { title, description, image } = Astro.props;
 <html lang="en" class="h-full antialiased dark">
   <head>
     <BaseHead title={title} description={description} image={image} />
+    <ClientRouter />
 
     <style is:global>
       html.dark .astro-code,
@@ -28,6 +31,24 @@ const { title, description, image } = Astro.props;
         border: 1px solid rgba(255, 255, 255, 0.1);
         background-color: rgba(255, 255, 255, 0.05) !important;
         border-radius: 0.75rem !important;
+      }
+
+      /* scroll-triggered fade-up */
+      .section {
+        opacity: 0;
+        transform: translateY(24px);
+        transition:
+          opacity 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+          transform 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      }
+      .section.in-view {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* custom cursor — pointer devices only */
+      @media (hover: hover) {
+        html, html * { cursor: none !important; }
       }
     </style>
 
@@ -82,6 +103,34 @@ const { title, description, image } = Astro.props;
   <body
     class="w-full h-full bg-white dark:bg-base-950 transition-colors duration-150 dark:transition-color dark:duration-150 lowercase"
   >
+    <CustomCursor client:load />
     <slot />
+
+    <script>
+      import Lenis from 'lenis';
+
+      const lenis = new Lenis({ duration: 1.2 });
+
+      function raf(time: number) {
+        lenis.raf(time);
+        requestAnimationFrame(raf);
+      }
+      requestAnimationFrame(raf);
+
+      document.addEventListener('astro:page-load', () => {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('in-view');
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.07, rootMargin: '0px 0px -40px 0px' }
+        );
+        document.querySelectorAll('.section').forEach((el) => observer.observe(el));
+      });
+    </script>
   </body>
 </html>
