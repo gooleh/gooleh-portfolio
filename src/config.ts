@@ -1,5 +1,5 @@
 export const BASE = '';
-export const SITE = 'https://your-project.vercel.app'; // Vercel 배포 후 실제 URL로 변경
+export const SITE = 'https://gooleh-portfolio.vercel.app';
 export const SITE_FAVICON = '🌎';
 
 export const BASE_COLOR = 'zinc';
