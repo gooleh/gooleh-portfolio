@@ -1,4 +1,4 @@
-# i'm florian. i live in berlin, where i create things for the web.
+# i'm tagyue (이태규). i live in seoul, where i create things for the web.
 
 i was one of the only kids in my class without a game console, but
 we did have a computer. when i was 12, I got a coding book for

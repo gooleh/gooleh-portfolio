@@ -70,7 +70,7 @@ const projects = defineCollection({
 
 const posts = defineCollection({
   loader: authorFeedLoader({
-    identifier: "flo-bit.dev",
+    identifier: "leetagyue.bsky.social",
   }),
 });
 
