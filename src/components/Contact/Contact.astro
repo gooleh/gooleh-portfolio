@@ -1,7 +1,6 @@
 ---
 import { SOCIALS } from "src/config";
 import SocialLink from "../Helper/SocialLink.astro";
-import Bluesky from "$components/Icons/Bluesky.astro";
 import LinkedIn from "$components/Icons/LinkedIn.astro";
 import Github from "$components/Icons/Github.astro";
 import Mail from "$components/Icons/Mail.astro";
@@ -38,12 +37,6 @@ import Mail from "$components/Icons/Mail.astro";
               <LinkedIn class="w-6 h-6" />
             </svelte:fragment>
             linkedin
-          </SocialLink>
-          <SocialLink href={SOCIALS.BLUESKY} class="mt-4">
-            <svelte:fragment slot="icon">
-              <Bluesky class="w-6 h-6" />
-            </svelte:fragment>
-            bluesky
           </SocialLink>
           <SocialLink href={SOCIALS.MAIL} class="mt-8">
             <svelte:fragment slot="icon">
