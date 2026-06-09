@@ -29,14 +29,24 @@ const { projects } = Astro.props;
     {projects.length === 0 ? (
       <p class="text-base-400 dark:text-base-500 text-sm">no projects yet — check back soon.</p>
     ) : (
-      <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 group/projects">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 group/projects">
         {projects.map((project) => (
           <div
             class={cn(
-              "group relative aspect-square pointer-events-auto group-hover/projects:opacity-60 hover:!opacity-100 border border-white/15 overflow-hidden rounded-2xl transition-opacity duration-500"
+              "project-card group relative aspect-[16/10] pointer-events-auto group-hover/projects:opacity-60 hover:!opacity-100 border border-white/15 overflow-hidden rounded-2xl transition-opacity duration-500"
             )}
           >
-              {project.thumbnail ? (
+              {project.video ? (
+                <video
+                  src={project.video}
+                  poster={project.thumbnail || undefined}
+                  class="absolute inset-0 h-full w-full object-cover rounded-3xl"
+                  muted
+                  loop
+                  playsinline
+                  preload="metadata"
+                ></video>
+              ) : project.thumbnail ? (
                 <img
                   src={project.thumbnail}
                   alt={project.name}
@@ -73,3 +83,48 @@ const { projects } = Astro.props;
     )}
   </div>
 </div>
+
+<style>
+  .project-card {
+    transition: transform 0.3s ease-out;
+    will-change: transform;
+  }
+  .project-card.tilting {
+    transition: transform 0.06s linear;
+  }
+</style>
+
+<script>
+  function initCards() {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    document.querySelectorAll<HTMLElement>('.project-card').forEach((card) => {
+      const video = card.querySelector('video');
+
+      if (!reducedMotion) {
+        card.addEventListener('mousemove', (e) => {
+          card.classList.add('tilting');
+          const rect = card.getBoundingClientRect();
+          const x = (e.clientX - rect.left) / rect.width - 0.5;
+          const y = (e.clientY - rect.top) / rect.height - 0.5;
+          card.style.transform = `perspective(700px) rotateY(${x * 14}deg) rotateX(${-y * 14}deg) scale(1.03)`;
+        });
+      }
+
+      card.addEventListener('mouseenter', () => {
+        if (!reducedMotion) video?.play().catch(() => {});
+      });
+
+      card.addEventListener('mouseleave', () => {
+        card.classList.remove('tilting');
+        card.style.transform = '';
+        if (video) {
+          video.pause();
+          video.currentTime = 0;
+        }
+      });
+    });
+  }
+
+  document.addEventListener('astro:page-load', initCards);
+</script>

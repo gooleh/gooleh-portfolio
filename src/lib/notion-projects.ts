@@ -7,6 +7,7 @@ export type NotionProject = {
   description: string;
   details: string;
   thumbnail: string;
+  video: string;
   technologies: string[];
   features: string[];
   challenges: string;
@@ -53,6 +54,7 @@ function parsePages(results: any[]): NotionProject[] {
           || p.Image?.files?.[0]?.external?.url
           || p.Image?.files?.[0]?.file?.url
           || '',
+        video: p.Video?.url || '',
         technologies: p.Technologies?.multi_select?.map((s: any) => s.name) || [],
         features: getTextContent(p.Features?.rich_text)
           .split('\n')

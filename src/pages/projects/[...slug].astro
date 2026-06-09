@@ -43,13 +43,25 @@ const { project } = Astro.props;
       </div>
     )}
 
-    {project.thumbnail && (
+    {(project.video || project.thumbnail) && (
       <div class="mb-10 rounded-2xl overflow-hidden border border-white/10">
-        <img
-          src={project.thumbnail}
-          alt={project.name}
-          class="w-full object-cover"
-        />
+        {project.video ? (
+          <video
+            src={project.video}
+            poster={project.thumbnail || undefined}
+            class="w-full object-cover"
+            autoplay
+            muted
+            loop
+            playsinline
+          ></video>
+        ) : (
+          <img
+            src={project.thumbnail}
+            alt={project.name}
+            class="w-full object-cover"
+          />
+        )}
       </div>
     )}
 

@@ -1,5 +1,5 @@
 ---
-import { BASE, SITE_FAVICON } from "../config";
+import { BASE, SITE, SITE_FAVICON, SOCIALS } from "../config";
 
 interface Props {
   title: string;
@@ -11,14 +11,29 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
 const { title, description, image = "og.jpg" } = Astro.props;
 
-const defaultTitle = "hi, i'm tagyue";
+const defaultTitle = "hi, i'm tae-gyue";
 const defaultDescription =
-  "hello world! this is my personal website. i'm tagyue, a software engineer based in seoul.";
+  "hello world! this is my personal website. i'm tae-gyue, a software engineer based in seoul.";
+
+const personJsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: "TaeGyue Lee",
+  alternateName: "이태규",
+  url: SITE,
+  jobTitle: "Software Engineer",
+  address: { "@type": "PostalAddress", addressLocality: "Seoul", addressCountry: "KR" },
+  sameAs: [SOCIALS.GITHUB, SOCIALS.LINKEDIN],
+});
 ---
 
 <!-- Global Metadata -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+<!-- Pretendard font -->
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css" />
 
 <link
   rel="icon"
@@ -51,3 +66,6 @@ const defaultDescription =
   content={description || defaultDescription}
 />
 <meta property="twitter:image" content={new URL(BASE + image, Astro.url)} />
+
+<!-- Structured data -->
+<script type="application/ld+json" set:html={personJsonLd} />

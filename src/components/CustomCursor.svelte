@@ -9,6 +9,7 @@
 
   onMount(() => {
     if (!window.matchMedia('(hover: hover)').matches) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     let animId: number;
 

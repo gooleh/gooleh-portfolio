@@ -98,16 +98,22 @@ Keep entries short. The goal is a scannable reference, not a tutorial.
 | 파일 | 역할 |
 |---|---|
 | `src/config.ts` | 사이트 URL, 파비콘, 테마 색상, 소셜 링크 |
-| `src/content/main/about.md` | About 섹션 본문 |
-| `src/components/BaseHead.astro` | SEO 메타태그 |
+| `src/content/main/about.md` | About 섹션 본문 (`i'm tae-gyue`) |
+| `src/components/BaseHead.astro` | SEO 메타태그 + Pretendard 폰트 CDN |
 | `src/components/Footer.astro` | 푸터 크레딧 |
-| `src/components/About/Resume/Resume.astro` | 경력/학력 (코트야드 바이 메리어트 / 포시즌스 / 인하공업전문대학) |
+| `src/components/About/About.astro` | Depth3D 제거 → 일반 `<Image>` 교체 완료 |
+| `src/components/About/Resume/Resume.astro` | 경력: 포시즌스(2025~현재) / 코트야드(2022~2025) / 인하공전(2022~2025) |
 | `src/assets/about/me/me.jpg` | 프로필 사진 |
 | `src/assets/about/logos/marriott.svg` | 메리어트 로고 (SVG) |
 | `src/assets/about/logos/fourseasons.svg` | 포시즌스 로고 (SVG) |
 | `src/assets/about/logos/inha.svg` | 인하공업전문대학 로고 (SVG) |
-| `src/lib/notion-projects.ts` | Notion DB 프로젝트 fetch |
+| `src/lib/notion-projects.ts` | Notion DB 프로젝트 fetch (개인 + 팀 DB 병렬 fetch, Published 필터) |
 | `src/content/config.ts` | Bluesky 제거 완료, blog 컬렉션만 유지 |
+| `src/layouts/BaseLayout.astro` | Pretendard 폰트 전역 적용 |
+| `src/components/Learning/Learning.svelte` | 인하공전 커리큘럼 (2022–2025) + 2025-08 vibe coding 항목 |
+| `src/components/Projects/Projects.astro` | 2열 그리드, aspect-[16/10], 프로젝트 카드 3D tilt |
+| `public/thumbnails/` | 프로젝트 썸네일 이미지 저장 디렉토리 |
+| `scripts/add-project.mjs` | 신규 프로젝트 Notion DB 추가 스크립트 |
 
 ### 프로젝트 시스템 (Notion 연동)
 
@@ -123,16 +129,20 @@ Keep entries short. The goal is a scannable reference, not a tutorial.
 | `Slug` | rich_text | URL slug — **한국어 제목이면 반드시 입력** (예: `my-project`) |
 | `Description` | rich_text | 짧은 설명 |
 | `Details` | rich_text | 상세 설명 |
-| `Image` | url | 썸네일 이미지 URL |
+| `Image` | url | 썸네일 (구 스키마 — 기존 프로젝트) |
+| `AdditionalImages` | rich_text | 추가 이미지 URL 쉼표 구분 (구 스키마) |
+| `Image1` | url | 대표 썸네일 (신 스키마 — 신규 프로젝트) |
+| `Image2`~`Image7` | url | 상세 페이지 이미지 (신 스키마) |
 | `Technologies` | multi_select | 기술 스택 태그 |
 | `Features` | rich_text | 기능 목록 (줄바꿈 구분) |
 | `Challenges` | rich_text | 어려웠던 점 |
-| `AdditionalImages` | rich_text | 추가 이미지 URL (쉼표 구분) |
 | `RepoUrl` | url | GitHub 링크 |
 | `ProjectUrl` | url | 배포 링크 |
 | `Order` | number | 정렬 순서 (낮을수록 앞) |
+| `Video` | url | hover 재생용 영상 (mp4/webm) — 있으면 카드·상세에서 영상, 없으면 이미지 폴백 |
 
-**프로젝트 추가 방법**: Notion DB에 페이지 추가 → `npx vercel --prod` 재배포
+**프로젝트 추가 방법**: `node scripts/add-project.mjs [경로]` 실행 → `npx vercel --prod` 재배포
+- 숨기고 싶은 프로젝트: Notion에서 `Published` 체크박스 해제 (DB에 컬럼 1회 추가 필요)
 
 ### UX 업그레이드 완료 현황
 
@@ -140,21 +150,22 @@ Keep entries short. The goal is a scannable reference, not a tutorial.
 |---|---|---|
 | Lenis smooth scroll | `src/layouts/BaseLayout.astro` | duration 1.2 |
 | Astro View Transitions | `src/layouts/BaseLayout.astro` | `<ClientRouter />` |
-| 스크롤 fade-up 애니메이션 | `src/layouts/BaseLayout.astro` (global CSS + IntersectionObserver) | `.section` 클래스 대상 |
+| 스크롤 fade-up 애니메이션 | `src/layouts/BaseLayout.astro` | `.section` 클래스 대상 |
 | 커스텀 커서 (dot + ring) | `src/components/CustomCursor.svelte` | hover 기기에서만 활성, cyan `#22d3ee` |
 | 한국어 slug 지원 | `src/lib/notion-projects.ts` | `toSlug()`에 `가-힣` 범위 추가 |
 | Map 서울 좌표 | `src/pages/map/index.astro` | `[126.978, 37.5665]` |
-| Learning 섹션 개인화 | `src/components/Learning/Learning.svelte` | 인하공업전문대학 커리큘럼 (2022–2025) |
+| Learning show more → 스크롤 자동 접힘 | `src/components/Learning/Learning.svelte` | 섹션 하단 지나치면 자동 collapse |
+| Pretendard 폰트 | `src/components/BaseHead.astro` + `src/layouts/BaseLayout.astro` | CDN dynamic subset |
+| 프로젝트 카드 3D tilt | `src/components/Projects/Projects.astro` | mousemove 14° + scale 1.03 |
+| 프로젝트 카드 2열 레이아웃 | `src/components/Projects/Projects.astro` | aspect-[16/10] |
+| 프로젝트 카드 영상 썸네일 | `src/components/Projects/Projects.astro` + `src/pages/projects/[...slug].astro` | Notion `Video` url — hover 시 재생, 떠나면 정지·리셋. 카드는 poster=Image1 |
+| prefers-reduced-motion 지원 | `BaseLayout.astro` / `CustomCursor.svelte` / `Projects.astro` | Lenis·tilt·fade-up·커서·영상 자동재생 모두 비활성화 |
+| SEO: sitemap + robots.txt | `astro.config.mjs` (`@astrojs/sitemap`) + `public/robots.txt` | `/sitemap-index.xml` |
+| SEO: Person JSON-LD | `src/components/BaseHead.astro` | schema.org Person 구조화 데이터 |
 
-### 알려진 이슈
+### 다음 작업
 
-- **Depth3D 프로필 사진** — `src/components/About/About.astro`에서 `depthMe = imageMe` (동일 파일)로 설정됨. 별도 depth map 이미지가 없어 3D 효과가 어색하게 보일 수 있음. 해결책: ① depth map 생성 후 교체, ② Depth3D 컴포넌트 제거하고 일반 `<Image>` 사용.
-
-### 다음 작업 후보
-
-1. **Depth3D 이슈 해결** — depth map 생성 또는 일반 이미지로 교체
-2. **폰트 업그레이드** — Pretendard(한/영 최적화) 또는 Geist 적용
-3. **프로젝트 카드 3D tilt** — 마우스 hover 시 카드가 3D로 기울어지는 효과
+- (없음 — 신규 프로젝트에 영상 썸네일을 적용하려면 Notion `Video` 컬럼에 mp4/webm URL 입력 또는 `add-project.mjs` 프롬프트 사용)
 
 ### Tailwind 주의사항
 - `@tailwindcss/aspect-ratio` 플러그인 **제거됨** — 네이티브 `aspect-ratio` 유틸리티(`aspect-square` 등)와 충돌해서 제거. `aspect-w-*` / `aspect-h-*` 클래스 사용 불가.
@@ -183,6 +194,26 @@ npm run dev        # 로컬 개발 서버 (localhost:4321)
 npm run build      # 타입 체크 후 정적 빌드
 npx vercel --prod  # 프로덕션 배포
 ```
+
+### 프로젝트 추가 스크립트
+
+```bash
+# 개인 프로젝트 DB에 추가
+node scripts/add-project.mjs /path/to/project
+
+# 팀 프로젝트 DB에 추가
+node scripts/add-project.mjs /path/to/project --team
+
+# 현재 디렉토리 기준
+node scripts/add-project.mjs
+```
+
+- `package.json`에서 이름·설명·기술스택 자동 감지
+- `git remote`에서 repo URL 자동 감지
+- 프롬프트로 확인·수정 후 Notion DB에 등록
+- `Published: true`로 기본 설정 (사이트에 바로 노출)
+- 썸네일: **로컬 파일 경로 입력 시** `public/thumbnails/<slug>.<ext>` 로 자동 복사 + Vercel URL 자동 설정
+- 추가 후 `git add public/thumbnails/` → `npx vercel --prod` 재배포 필요
 
 ### 건드리지 말 것
 - `public/lowpoly_nature/` — 3D 씬용 .glb 모델

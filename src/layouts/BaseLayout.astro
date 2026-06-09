@@ -46,9 +46,22 @@ const { title, description, image } = Astro.props;
         transform: translateY(0);
       }
 
+      body {
+        font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      }
+
       /* custom cursor — pointer devices only */
-      @media (hover: hover) {
+      @media (hover: hover) and (prefers-reduced-motion: no-preference) {
         html, html * { cursor: none !important; }
+      }
+
+      /* reduced motion — skip entrance animations */
+      @media (prefers-reduced-motion: reduce) {
+        .section {
+          opacity: 1;
+          transform: none;
+          transition: none;
+        }
       }
     </style>
 
@@ -109,13 +122,15 @@ const { title, description, image } = Astro.props;
     <script>
       import Lenis from 'lenis';
 
-      const lenis = new Lenis({ duration: 1.2 });
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const lenis = new Lenis({ duration: 1.2 });
 
-      function raf(time: number) {
-        lenis.raf(time);
+        function raf(time: number) {
+          lenis.raf(time);
+          requestAnimationFrame(raf);
+        }
         requestAnimationFrame(raf);
       }
-      requestAnimationFrame(raf);
 
       document.addEventListener('astro:page-load', () => {
         const observer = new IntersectionObserver(
