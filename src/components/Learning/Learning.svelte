@@ -1,5 +1,6 @@
 <script lang="ts">
   import { slide } from "svelte/transition";
+  import { onDestroy, tick } from "svelte";
 
   interface Learning {
     title: string;
@@ -8,6 +9,12 @@
   }
 
   const learnings: Learning[] = [
+    {
+      title: "vibe coding & personal projects",
+      description:
+        "AI-assisted development with claude code. astro 5, svelte 5, three.js / threlte, tailwind css v3, notion API, lenis, GSAP, vercel — building this portfolio and other side projects.",
+      date: "2025-08",
+    },
     {
       title: "data communication & AI",
       description:
@@ -62,6 +69,43 @@
   }
 
   let showAll = false;
+  let scrollCleanup: (() => void) | null = null;
+
+  function cleanup() {
+    if (scrollCleanup) {
+      scrollCleanup();
+      scrollCleanup = null;
+    }
+  }
+
+  async function handleShowAll() {
+    showAll = true;
+    await tick();
+
+    const section = document.getElementById('learning');
+    if (!section) return;
+
+    // 펼쳐진 후 섹션 하단의 절대 Y 좌표
+    const sectionBottom = section.getBoundingClientRect().bottom + window.scrollY;
+    const scrollYAtExpansion = window.scrollY;
+
+    const onScroll = () => {
+      const viewportBottom = window.scrollY + window.innerHeight;
+      // 최소 150px 이상 스크롤했고, 뷰포트 하단이 섹션 끝을 80px 이상 지났을 때 접힘
+      const scrolledEnough = window.scrollY > scrollYAtExpansion + 150;
+      const passedContent = viewportBottom > sectionBottom + 80;
+
+      if (scrolledEnough && passedContent) {
+        showAll = false;
+        cleanup();
+      }
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    scrollCleanup = () => window.removeEventListener('scroll', onScroll);
+  }
+
+  onDestroy(cleanup);
 
   $: shownLearnings = showAll ? learnings : [...learnings].slice(0, 3);
 </script>
@@ -129,7 +173,7 @@
           {#if !showAll}
             <div class="justify-center flex">
               <button
-                on:click={() => (showAll = true)}
+                on:click={handleShowAll}
                 type="button"
                 class="group flex items-center rounded-full mr-4 bg-white/90 px-4 py-2 text-sm font-medium text-base-800 shadow-lg shadow-base-800/5 ring-1 ring-base-900/5 backdrop-blur dark:bg-white/5 dark:text-base-200 dark:ring-white/10 dark:hover:ring-white/20"
                 aria-label="Update dimensions"

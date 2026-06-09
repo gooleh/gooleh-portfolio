@@ -14,25 +14,25 @@ let resume: Array<{
   end: string | { label: string; dateTime: string };
 }> = [
   {
-    company: "courtyard by marriott",
-    title: "food & beverage",
-    logo: marriott,
-    start: "2020",
-    end: "2023",
-  },
-  {
     company: "four seasons hotel",
     title: "housekeeping",
     logo: fourseasons,
-    start: "2018",
-    end: "2020",
+    start: "2025",
+    end: { label: "present", dateTime: new Date().getFullYear().toString() },
+  },
+  {
+    company: "courtyard by marriott",
+    title: "food & beverage",
+    logo: marriott,
+    start: "2022",
+    end: "2025",
   },
   {
     company: "inha technical college",
     title: "computer information engineering",
     logo: inha,
-    start: "2014",
-    end: "2018",
+    start: "2022",
+    end: "2025",
   },
 ];
 ---

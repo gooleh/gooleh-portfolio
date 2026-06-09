@@ -1,4 +1,4 @@
-# i'm tagyue (이태규). i live in seoul.
+# i'm tae-gyue (이태규). i live in seoul.
 
 i work nights at a hotel, which gives me a lot of quiet time to think.
 i started filling that silence with code — and writing, and music.
