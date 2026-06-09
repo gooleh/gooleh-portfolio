@@ -9,5 +9,8 @@
 **[Notion API로 DB 스키마 변경]** — 컬럼 추가는 수동이 아니라 `databases.update`로 자동화할 수 있다.
 > `notion.databases.update({ database_id, properties: { Video: { url: {} } } })` 한 줄이면 url 타입 프로퍼티가 생긴다. 스키마 마이그레이션을 스크립트로 남기면 팀 DB에도 동일하게 재적용 가능.
 
+**[Notion을 블로그 CMS로 쓰기]** — `notion-to-md`(블록→마크다운) + `marked`(마크다운→HTML) 조합이면 충분하다.
+> 빌드 타임에 fetch하므로 런타임 API 호출이 없고 Notion API rate limit 걱정도 빌드 시 한 번뿐. 여러 페이지(홈/목록/상세)가 같은 데이터를 쓰면 모듈 레벨 Promise 캐시로 중복 fetch를 막는 게 핵심.
+
 **[정적 사이트 SEO 기본 3종]** — sitemap, robots.txt, JSON-LD 구조화 데이터.
 > Astro는 `@astrojs/sitemap` 통합으로 빌드 시 자동 생성(`site` 설정 필수). robots.txt에 sitemap 경로를 명시하고, 포트폴리오엔 schema.org `Person` 타입 JSON-LD를 넣으면 검색 결과에 인물 정보가 풍부하게 노출될 수 있다.

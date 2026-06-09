@@ -143,6 +143,31 @@ Keep entries short. The goal is a scannable reference, not a tutorial.
 
 **프로젝트 추가 방법**: `node scripts/add-project.mjs [경로]` 실행 → `npx vercel --prod` 재배포
 - 숨기고 싶은 프로젝트: Notion에서 `Published` 체크박스 해제 (DB에 컬럼 1회 추가 필요)
+- ⚠️ **개인 DB는 구 스키마** (`Image` url + `AdditionalImages` rich_text 쉼표 구분) — `add-project.mjs`는 `Image1~7` 신 스키마로 저장하므로 개인 DB에 쓸 때 프로퍼티 불일치 주의
+
+### 블로그 시스템 (Notion 연동)
+
+블로그도 프로젝트와 동일하게 **Notion DB에서 빌드 시 fetch**합니다. 본문은 `notion-to-md`로 마크다운 변환 후 `marked`로 HTML 렌더링.
+
+- **fetch 로직**: `src/lib/notion-blog.ts` (`getNotionBlogPosts()` — 모듈 캐시로 빌드당 1회 fetch)
+- **표시**: `src/components/Blog/BlogLatest.astro` (홈, 최신 4개), `src/pages/blog/index.astro` (전체 목록), `src/pages/blog/post/[...slug].astro` (본문)
+- 구 마크다운 컬렉션(`src/content/blog/`)은 제거됨 — `content/config.ts`는 빈 collections
+
+**블로그 DB 스키마** (주요 컬럼):
+| 프로퍼티 | 타입 | 설명 |
+|---|---|---|
+| `Title` | title | 글 제목 |
+| `Slug` | rich_text | URL slug — 없으면 제목에서 자동 생성 |
+| `Description` | rich_text | 목록에 표시되는 요약 |
+| `Date` | date | 발행일 (최신순 정렬 기준) |
+| `Tags` | multi_select | 태그 |
+| `Category` | select | 카테고리 |
+| `Published` | checkbox | 체크된 글만 노출 |
+| `SeriesName` / `SeriesOrder` | rich_text / number | 시리즈 표시용 |
+| `ReadTime` | number | 읽기 시간(분) |
+
+**글 추가 방법**: Notion 블로그 DB에서 글 작성 (본문은 페이지 안에 작성 — 제목/문단/코드 블록 지원) → `Published` 체크 → `npx vercel --prod` 재배포
+- `scripts/seed-blog.mjs`: 초기 시딩 스크립트 (재실행 안전 — slug 부여, 본문 보강, 신규 3개 생성에 사용됨)
 
 ### UX 업그레이드 완료 현황
 
@@ -162,6 +187,7 @@ Keep entries short. The goal is a scannable reference, not a tutorial.
 | prefers-reduced-motion 지원 | `BaseLayout.astro` / `CustomCursor.svelte` / `Projects.astro` | Lenis·tilt·fade-up·커서·영상 자동재생 모두 비활성화 |
 | SEO: sitemap + robots.txt | `astro.config.mjs` (`@astrojs/sitemap`) + `public/robots.txt` | `/sitemap-index.xml` |
 | SEO: Person JSON-LD | `src/components/BaseHead.astro` | schema.org Person 구조화 데이터 |
+| 블로그 섹션 (Notion 연동) | `BlogLatest.astro` + `pages/blog/` | 홈 최신 4개 + 전체 목록 + 본문 페이지, 네비게이션에 blog 추가 |
 
 ### 다음 작업
 

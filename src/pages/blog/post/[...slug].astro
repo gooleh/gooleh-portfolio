@@ -1,94 +1,57 @@
 ---
-import { type CollectionEntry } from "astro:content";
 import BaseLayout from "$layouts/BaseLayout.astro";
-// import BlogPost from "$layouts/BlogPost.astro";
-// import Header from "$components/Header.astro";
-import Footer from "$components/Footer.astro";
-import { Image } from "astro:assets";
-import FormattedDate from "$components/Helper/FormattedDate.astro";
-import { BASE } from "../../../config.ts";
-import { getBlogPosts } from "src/utils";
-import ProseWrapper from "$layouts/ProseWrapper.astro";
 import BlogPost from "$layouts/BlogPost.astro";
-// import BlueskyLikes from "$components/bluesky/BlueskyLikes.astro";
+import Navbar from "$components/Navigation/Navbar.svelte";
+import { getBlogPosts } from "src/utils";
+import type { NotionBlogPost } from "src/utils";
+import { marked } from "marked";
 
 export async function getStaticPaths() {
   const posts = await getBlogPosts();
-  return posts.map((post: any) => ({
+  return posts.map((post) => ({
     params: { slug: post.slug },
-    props: post,
+    props: { post },
   }));
 }
-type Props = CollectionEntry<"blog">;
 
-const post = Astro.props;
-const { Content } = await post.render();
+type Props = { post: NotionBlogPost };
+const { post } = Astro.props;
 
-// const images = import.meta.glob<{ default: ImageMetadata }>(
-//   "/src/assets/*.{jpeg,jpg,png,gif}"
-// );
-// const replacedHero = post.data.heroImage?.replace("../..", "/src");
-// if (replacedHero && !images[replacedHero])
-//   throw new Error(
-//     `"${post.data.heroImage}" does not exist in glob: "src/assets/*.{jpeg,jpg,png,gif}"`
-//   );
+const html = await marked.parse(post.body);
+
+const formattedDate = post.pubDate
+  .toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+  .toLowerCase();
 ---
 
-<!-- <BaseLayout {...post.data} image={post.slug + ".png"}>
-  <Header active="blog" />
+<BaseLayout title={post.title} description={post.description}>
+  <Navbar client:load active="blog" />
 
-  <main class="max-w-2xl lg:max-w-3xl mx-auto my-0 h-full p-4">
-    {
-      replacedHero && post.data.hideHero !== true ? (
-        <Image
-          src={images[replacedHero]()}
-          alt=""
-          class="w-full h-80 object-cover rounded-xl shadow"
-        />
-      ) : null
-    }
-    <BlogPost>
-      <div class="flex mt-8 items-center gap-x-4 text-xs">
-        <FormattedDate date={post.data.pubDate} />
-        <div class="flex gap-x-2">
-          {
-            post.data.tags?.map((tag: string) => (
-              <a
-                href={BASE + "/tags/" + tag}
-                class="relative z-10 rounded-full bg-base-100 px-3 py-1.5 font-medium text-base-700 hover:bg-base-200 dark:bg-base-800 dark:hover:bg-base-700 dark:text-base-300 border border-base-200 dark:border-base-700"
-              >
-                {tag}
-              </a>
-            ))
-          }
-        </div>
-      </div>
-
-      <h1 class="mt-4">{post.data.title}</h1>
-      <Content />
-      <BlueskyLikes />
-    </BlogPost>
-  </main>
-  <Footer />
-</BaseLayout> -->
-<BaseLayout>
   <BlogPost>
-    <div class="flex mt-8 items-center gap-x-4 text-xs">
-      <FormattedDate date={post.data.pubDate} />
-      <div class="flex gap-x-2">
-        {
-          post.data.tags?.map((tag: string) => (
-            <a
-              href={BASE + "/tags/" + tag}
-              class="relative z-10 rounded-full bg-base-100 px-3 py-1.5 font-medium text-base-700 hover:bg-base-200 dark:bg-base-800 dark:hover:bg-base-700 dark:text-base-300 border border-base-200 dark:border-base-700"
-            >
-              {tag}
-            </a>
-          ))
-        }
+    <div class="not-prose mb-4 mt-8">
+      <a
+        href="/blog"
+        class="text-sm text-base-400 hover:text-accent-400 transition-colors"
+      >
+        ← all posts
+      </a>
+    </div>
+
+    <div class="not-prose flex items-center gap-x-4 text-xs">
+      <time datetime={post.pubDate.toISOString()} class="text-base-400 dark:text-base-500">
+        {formattedDate}
+      </time>
+      <div class="flex flex-wrap gap-x-2 gap-y-1">
+        {post.tags.map((tag: string) => (
+          <span class="relative z-10 rounded-full bg-base-100 px-3 py-1.5 font-medium text-base-700 dark:bg-base-800 dark:text-base-300 border border-base-200 dark:border-base-700">
+            {tag}
+          </span>
+        ))}
       </div>
     </div>
-    <h1>{post.data.title}</h1>
-    <Content />
+
+    <h1 class="mt-4">{post.title}</h1>
+
+    <div set:html={html} />
   </BlogPost>
 </BaseLayout>

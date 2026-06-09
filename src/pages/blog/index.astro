@@ -1,0 +1,75 @@
+---
+import BaseLayout from "$layouts/BaseLayout.astro";
+import Navbar from "$components/Navigation/Navbar.svelte";
+import { getBlogPosts } from "src/utils";
+
+const posts = await getBlogPosts();
+
+function formatDate(date: Date) {
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+---
+
+<BaseLayout title="blog" description="thoughts on things i'm learning or working on.">
+  <Navbar client:load active="blog" />
+
+  <div class="mx-auto max-w-3xl px-6 lg:px-8 py-16 md:py-24">
+    <h1 class="text-4xl font-bold tracking-tight text-base-800 dark:text-base-100 sm:text-5xl">
+      my ramblings
+    </h1>
+    <p class="mt-6 text-base text-base-600 dark:text-base-400">
+      here are some of my thoughts on things i'm learning or working on.
+    </p>
+
+    <div class="mt-16 space-y-14">
+      {posts.map((post) => (
+        <article class="group relative flex flex-col items-start">
+          <div class="relative z-10 order-first mb-2 flex items-center gap-x-3 text-sm text-base-400 dark:text-base-500">
+            <time datetime={post.pubDate.toISOString()}>
+              {formatDate(post.pubDate).toLowerCase()}
+            </time>
+            {post.seriesName && (
+              <span class="text-xs text-accent-400/80 border border-accent-500/20 rounded-full px-2 py-0.5">
+                {post.seriesName} #{post.seriesOrder}
+              </span>
+            )}
+          </div>
+
+          <h2 class="text-lg z-10 font-semibold tracking-tight text-base-800 dark:text-base-100">
+            {post.title}
+          </h2>
+
+          <p class="relative z-10 mt-2 text-sm text-base-600 dark:text-base-400">
+            {post.description}
+          </p>
+
+          <a href={"/blog/post/" + post.slug}>
+            <div class="absolute -inset-x-4 -inset-y-5 z-0 scale-95 bg-base-50 opacity-0 transition group-hover:scale-100 group-hover:opacity-100 dark:bg-base-800/50 sm:-inset-x-6 sm:rounded-2xl" />
+            <span class="absolute -inset-x-4 -inset-y-5 z-20 sm:-inset-x-6 sm:rounded-2xl" />
+            <span class="relative z-10 mt-3 flex items-center text-sm font-medium text-base-400 transition-colors duration-200 group-hover:text-accent-400">
+              read
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-3 h-3 ml-1 mt-0.5"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                />
+              </svg>
+            </span>
+          </a>
+        </article>
+      ))}
+    </div>
+  </div>
+</BaseLayout>

@@ -1,14 +1,8 @@
 ---
 import { getBlogPosts } from "src/utils";
 
-interface Article {
-  title: string;
-  description: string;
-  date: string;
-  href: string;
-}
-
-const posts = (await getBlogPosts()).splice(0, 4);
+const allPosts = await getBlogPosts();
+const posts = allPosts.slice(0, 4);
 
 function formatDate(date: Date) {
   return date.toLocaleDateString("en-US", {
@@ -39,7 +33,7 @@ function formatDate(date: Date) {
               <article class="">
                 <div class="group relative flex flex-col items-start">
                   <div class="text-base z-10 font-semibold tracking-tight text-base-800 dark:text-base-100">
-                    {article.data.title}
+                    {article.title}
                   </div>
                   <div class="relative z-10 order-first mb-3 flex items-center text-sm text-base-400 dark:text-base-500 pl-3.5 mt-1">
                     <span
@@ -48,14 +42,14 @@ function formatDate(date: Date) {
                     >
                       <span class="h-4 w-0.5 rounded-full bg-base-200 dark:bg-base-500" />
                     </span>
-                    {formatDate(article.data.pubDate).toLowerCase()}
+                    {formatDate(article.pubDate).toLowerCase()}
                   </div>
 
                   <p class="relative z-10 mt-2 text-sm text-base-600 dark:text-base-400">
-                    {article.data.description}
+                    {article.description}
                   </p>
 
-                  <a href={"blog/post/" + article.slug}>
+                  <a href={"/blog/post/" + article.slug}>
                     <div class="absolute -inset-x-4 -inset-y-6 z-0 scale-95 bg-base-50 opacity-0 transition group-hover:scale-100 group-hover:opacity-100 dark:bg-base-800/50 sm:-inset-x-6 sm:rounded-2xl" />
                     <span class="absolute -inset-x-4 -inset-y-6 z-20 sm:-inset-x-6 sm:rounded-2xl" />
                     <span class="relative z-10 mt-4 flex items-center text-sm font-medium text-base-400 transition-colors duration-200 group-hover:text-accent-400">
@@ -81,6 +75,17 @@ function formatDate(date: Date) {
             ))
           }
         </div>
+
+        {allPosts.length > 4 && (
+          <div class="mt-16">
+            <a
+              href="/blog"
+              class="text-sm font-medium text-base-400 hover:text-accent-400 transition-colors"
+            >
+              all posts ({allPosts.length}) →
+            </a>
+          </div>
+        )}
       </div>
     </div>
   </div>
