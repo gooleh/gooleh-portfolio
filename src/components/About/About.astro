@@ -1,4 +1,8 @@
 ---
+import { Image } from "astro:assets";
+
+import imageMe from "$assets/about/me/me.jpg";
+
 import ProseWrapper from "$layouts/ProseWrapper.astro";
 import Resume from "./Resume/Resume.astro";
 
@@ -11,6 +15,17 @@ import { Content } from "$content/main/about.md";
       <div
         class="grid grid-cols-1 gap-y-16 lg:grid-cols-2 lg:grid-rows-[auto_1fr] lg:gap-y-12"
       >
+        <div class="lg:pl-20 w-full flex lg:justify-center">
+          <div class="max-w-sm px-2.5 lg:max-w-none">
+            <div class="rotate-3 size-96 -m-10 lg:-m-20">
+              <Image
+                src={imageMe}
+                alt="this is me"
+                class="w-full h-full rounded-2xl bg-base-100 object-cover dark:bg-base-800"
+              />
+            </div>
+          </div>
+        </div>
         <div class="lg:order-first lg:row-span-2">
           <ProseWrapper
             class="prose-h1:text-4xl prose-h1:sm:text-5xl prose-h1:tracking-tight prose-a:font-bold"
