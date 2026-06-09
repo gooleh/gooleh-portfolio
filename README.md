@@ -1,33 +1,47 @@
-# flo-bit portfolio
+# gooleh portfolio
 
-this is my portfolio, created using astro, svelte, threlte, threejs and tailwind. wip.
+personal portfolio site built with astro, svelte, threlte, threejs and tailwind.
 
-## demos
+## live
 
-[see it live here](https://flo-bit.dev/)
+[gooleh-portfolio.vercel.app](https://gooleh-portfolio.vercel.app)
 
-![screenshot](/static/image.jpg)
+## tech stack
 
-demo videos:
-
-https://github.com/user-attachments/assets/757d9b20-2232-4012-8013-68d5997960e6
-
-## techstack
-
-- sveltekit (static build using `@sveltejs/adapter-static`)
-- threlte (svelte wrapper for threejs)
-- tailwind
-- automatic deployment using github actions to github pages
-- typescript
+- astro 5 (static output)
+- svelte 5 components
+- threlte / three.js (interactive 3d planet on hero section)
+- tailwind css v3
+- notion api (project data fetched at build time)
+- vercel
 
 ## development
 
-clone the repo, install dependencies and run the dev server:
-
 ```bash
-git clone https://github.com/flo-bit/flo-bit.github.io.git
+git clone https://github.com/gooleh/gooleh-portfolio.git
+cd gooleh-portfolio
 npm install
 npm run dev
 ```
 
-when using it for your own portfolio, please remove the posthog analytics script from `src/app.html` (line 3-6)
+## environment variables
+
+create `.env.local` in the root:
+
+```
+NOTION_API_KEY=
+NOTION_PROJECTS_DB_ID=
+NOTION_TEAM_PROJECTS_DB_ID=
+NOTION_BLOG_DB_ID=
+NOTION_PARENT_PAGE_ID=
+```
+
+## deployment
+
+```bash
+npx vercel --prod
+```
+
+## credits
+
+hero 3d scene inspired by [flo-bit.dev](https://flo-bit.dev), built with threlte and three.js.
