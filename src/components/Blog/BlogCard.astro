@@ -1,0 +1,78 @@
+---
+import type { NotionBlogPost } from "src/utils";
+import { categoryHue } from "src/utils";
+
+type Props = {
+  post: NotionBlogPost;
+  featured?: boolean;
+};
+
+const { post, featured = false } = Astro.props;
+
+const hue = categoryHue(post.category || post.tags[0] || "dev");
+
+const formattedDate = post.pubDate
+  .toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
+  .toLowerCase();
+---
+
+<article
+  class={`group relative flex flex-col rounded-2xl border border-white/10 bg-white/[0.02] p-6 sm:p-7 overflow-hidden transition-all duration-300 hover:border-accent-400/30 hover:bg-white/[0.04] hover:-translate-y-1 hover:shadow-xl hover:shadow-accent-950/20 ${featured ? "sm:col-span-2" : ""}`}
+>
+  <div
+    class="absolute -top-20 -right-20 w-56 h-56 rounded-full blur-3xl opacity-[0.07] group-hover:opacity-[0.18] transition-opacity duration-500 pointer-events-none"
+    style={`background: hsl(${hue} 85% 60%)`}
+  >
+  </div>
+
+  <div class="relative z-10 flex flex-wrap items-center gap-2 text-xs">
+    {post.category && (
+      <span
+        class="rounded-full px-2.5 py-1 font-medium border"
+        style={`color: hsl(${hue} 85% 75%); border-color: hsl(${hue} 60% 50% / 0.25); background: hsl(${hue} 70% 50% / 0.08)`}
+      >
+        {post.category}
+      </span>
+    )}
+    {post.seriesName && (
+      <span class="text-base-500 dark:text-base-400 border border-white/10 rounded-full px-2.5 py-1">
+        {post.seriesName} · {post.seriesOrder}
+      </span>
+    )}
+  </div>
+
+  <h3
+    class={`relative z-10 mt-4 font-semibold tracking-tight text-base-800 dark:text-base-100 transition-colors duration-200 group-hover:text-accent-300 ${featured ? "text-2xl sm:text-3xl" : "text-lg"}`}
+  >
+    {post.title}
+  </h3>
+
+  <p
+    class={`relative z-10 mt-3 text-sm leading-relaxed text-base-600 dark:text-base-400 line-clamp-3 ${featured ? "sm:text-base max-w-2xl" : ""}`}
+  >
+    {post.description}
+  </p>
+
+  <div
+    class="relative z-10 mt-auto pt-5 flex items-center justify-between text-xs text-base-400 dark:text-base-500"
+  >
+    <span>{formattedDate}{post.readTime ? ` · ${post.readTime} min read` : ""}</span>
+    <span
+      class="flex items-center gap-1 font-medium transition-colors duration-200 group-hover:text-accent-400"
+    >
+      read
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="w-3 h-3 transition-transform duration-200 group-hover:translate-x-0.5"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
+      </svg>
+    </span>
+  </div>
+
+  <a href={"/blog/post/" + post.slug} class="absolute inset-0 z-20" aria-label={post.title}></a>
+</article>

@@ -72,7 +72,13 @@ async function fetchPosts(): Promise<NotionBlogPost[]> {
       })
     );
 
-    return posts;
+    // 같은 날짜의 글이 많아 시리즈/편 순서로 2차 정렬해 순서를 결정적으로 유지
+    return posts.sort((a, b) => {
+      const d = b.pubDate.getTime() - a.pubDate.getTime();
+      if (d !== 0) return d;
+      if (a.seriesName !== b.seriesName) return a.seriesName.localeCompare(b.seriesName);
+      return a.seriesOrder - b.seriesOrder;
+    });
   } catch (e) {
     console.error('Failed to fetch Notion blog posts:', e);
     return [];

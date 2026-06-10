@@ -2,22 +2,45 @@
 import BaseLayout from "$layouts/BaseLayout.astro";
 import BlogPost from "$layouts/BlogPost.astro";
 import Navbar from "$components/Navigation/Navbar.svelte";
-import { getBlogPosts } from "src/utils";
+import { getBlogPosts, categoryHue } from "src/utils";
 import type { NotionBlogPost } from "src/utils";
 import { marked } from "marked";
 
 export async function getStaticPaths() {
   const posts = await getBlogPosts();
-  return posts.map((post) => ({
-    params: { slug: post.slug },
-    props: { post },
-  }));
+
+  return posts.map((post) => {
+    let prev: NotionBlogPost | null = null;
+    let next: NotionBlogPost | null = null;
+
+    if (post.seriesName) {
+      // 같은 시리즈 안에서 편 순서로 이동
+      const series = posts
+        .filter((p) => p.seriesName === post.seriesName)
+        .sort((a, b) => a.seriesOrder - b.seriesOrder);
+      const i = series.findIndex((p) => p.slug === post.slug);
+      prev = series[i - 1] ?? null;
+      next = series[i + 1] ?? null;
+    } else {
+      // 시리즈가 아니면 날짜순 이웃 글
+      const i = posts.findIndex((p) => p.slug === post.slug);
+      next = posts[i - 1] ?? null; // 더 최신
+      prev = posts[i + 1] ?? null; // 더 과거
+    }
+
+    return { params: { slug: post.slug }, props: { post, prev, next } };
+  });
 }
 
-type Props = { post: NotionBlogPost };
-const { post } = Astro.props;
+type Props = {
+  post: NotionBlogPost;
+  prev: NotionBlogPost | null;
+  next: NotionBlogPost | null;
+};
+const { post, prev, next } = Astro.props;
 
 const html = await marked.parse(post.body);
+const hue = categoryHue(post.category || post.tags[0] || "dev");
 
 const formattedDate = post.pubDate
   .toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
@@ -27,31 +50,114 @@ const formattedDate = post.pubDate
 <BaseLayout title={post.title} description={post.description}>
   <Navbar client:load active="blog" />
 
+  <!-- 읽기 진행 바 -->
+  <div
+    id="reading-progress"
+    class="fixed top-0 left-0 h-0.5 bg-accent-400 z-50 pointer-events-none transition-[width] duration-100 ease-out"
+    style="width: 0%"
+  >
+  </div>
+
   <BlogPost>
-    <div class="not-prose mb-4 mt-8">
+    <div class="not-prose mb-10 mt-4">
       <a
         href="/blog"
-        class="text-sm text-base-400 hover:text-accent-400 transition-colors"
+        class="group inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-xs font-medium text-base-400 hover:border-accent-400/30 hover:text-accent-300 transition-colors duration-200"
       >
-        ← all posts
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="w-3 h-3 transition-transform duration-200 group-hover:-translate-x-0.5"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"></path>
+        </svg>
+        all posts
       </a>
     </div>
 
-    <div class="not-prose flex items-center gap-x-4 text-xs">
+    <div class="not-prose flex flex-wrap items-center gap-2 text-xs">
+      {post.category && (
+        <span
+          class="rounded-full px-2.5 py-1 font-medium border"
+          style={`color: hsl(${hue} 85% 75%); border-color: hsl(${hue} 60% 50% / 0.25); background: hsl(${hue} 70% 50% / 0.08)`}
+        >
+          {post.category}
+        </span>
+      )}
+      {post.seriesName && (
+        <span class="text-base-400 border border-white/10 rounded-full px-2.5 py-1">
+          {post.seriesName} · {post.seriesOrder}
+        </span>
+      )}
       <time datetime={post.pubDate.toISOString()} class="text-base-400 dark:text-base-500">
         {formattedDate}
       </time>
-      <div class="flex flex-wrap gap-x-2 gap-y-1">
+      {post.readTime > 0 && (
+        <span class="text-base-400 dark:text-base-500">· {post.readTime} min read</span>
+      )}
+    </div>
+
+    <h1
+      class="!mt-5 !mb-4 bg-gradient-to-br from-base-50 via-base-100 to-base-400 bg-clip-text text-transparent"
+    >
+      {post.title}
+    </h1>
+
+    {post.tags.length > 0 && (
+      <div class="not-prose mb-10 flex flex-wrap gap-1.5">
         {post.tags.map((tag: string) => (
-          <span class="relative z-10 rounded-full bg-base-100 px-3 py-1.5 font-medium text-base-700 dark:bg-base-800 dark:text-base-300 border border-base-200 dark:border-base-700">
-            {tag}
+          <span class="text-xs text-base-500 dark:text-base-400 bg-white/[0.04] border border-white/10 rounded-full px-2.5 py-1">
+            #{tag}
           </span>
         ))}
       </div>
-    </div>
-
-    <h1 class="mt-4">{post.title}</h1>
+    )}
 
     <div set:html={html} />
+
+    {(prev || next) && (
+      <div class="not-prose mt-16 grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-white/10 pt-8">
+        {prev ? (
+          <a
+            href={"/blog/post/" + prev.slug}
+            class="group rounded-2xl border border-white/10 bg-white/[0.02] p-5 hover:border-accent-400/30 hover:bg-white/[0.04] transition-colors duration-200"
+          >
+            <div class="text-xs text-base-500">← previous</div>
+            <div class="mt-2 text-sm font-medium text-base-700 dark:text-base-200 group-hover:text-accent-300 transition-colors duration-200 line-clamp-2">
+              {prev.title}
+            </div>
+          </a>
+        ) : (
+          <div></div>
+        )}
+        {next && (
+          <a
+            href={"/blog/post/" + next.slug}
+            class="group rounded-2xl border border-white/10 bg-white/[0.02] p-5 text-right hover:border-accent-400/30 hover:bg-white/[0.04] transition-colors duration-200"
+          >
+            <div class="text-xs text-base-500">next →</div>
+            <div class="mt-2 text-sm font-medium text-base-700 dark:text-base-200 group-hover:text-accent-300 transition-colors duration-200 line-clamp-2">
+              {next.title}
+            </div>
+          </a>
+        )}
+      </div>
+    )}
   </BlogPost>
 </BaseLayout>
+
+<script>
+  function updateProgress() {
+    const bar = document.getElementById("reading-progress");
+    if (!bar) return;
+    const el = document.documentElement;
+    const max = el.scrollHeight - el.clientHeight;
+    bar.style.width = (max > 0 ? (el.scrollTop / max) * 100 : 0) + "%";
+  }
+
+  document.addEventListener("scroll", updateProgress, { passive: true });
+  document.addEventListener("astro:page-load", updateProgress);
+</script>
